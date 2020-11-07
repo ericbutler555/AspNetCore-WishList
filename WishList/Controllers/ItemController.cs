@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System.Linq;
 using WishList.Data;
 using WishList.Models;
 
@@ -9,17 +8,16 @@ namespace WishList.Controllers
     public class ItemController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private DbSet<Item> _items;
 
         public ItemController(ApplicationDbContext context)
         {
             _context = context;
-            _items = _context.Items;
         }
 
         public IActionResult Index()
         {
-            return View("Index", _items);
+            var items = _context.Items.ToList();
+            return View("Index", items);
         }
 
         [HttpGet]
@@ -31,15 +29,15 @@ namespace WishList.Controllers
         [HttpPost]
         public IActionResult Create(Item item)
         {
-            _items.Add(item);
+            _context.Items.Add(item);
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int Id)
         {
-            Item item = _items.Find(Id);
-            _items.Remove(item);
+            Item item = _context.Items.Find(Id);
+            _context.Items.Remove(item);
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
